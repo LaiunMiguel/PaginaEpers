@@ -21,12 +21,11 @@ body {
     border-radius: 8px;
 }
 #map {
-    width: 100%;
-    height: 500px;
-    border: 1px solid #333;
-    border-radius: 8px;
+    height: 400px; /* Altura del mapa */
+    width: 100%;   /* Ancho del mapa */
     margin-bottom: 20px;
-}
+  }
+  
 .section {
     display: flex;
     justify-content: space-between;
