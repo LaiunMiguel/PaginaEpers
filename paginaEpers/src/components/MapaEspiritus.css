@@ -91,3 +91,17 @@ button:hover {
     background-color: #d62839;
     transform: scale(1.05);
 }
+
+.butonsContainer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.butonList{
+    justify-content:flex-start;
+}
+
+.buton{
+    justify-content: flex-end;
+}

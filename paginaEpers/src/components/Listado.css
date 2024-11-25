@@ -1,0 +1,109 @@
+body {
+    background-color: #1a1a1a; /* Fondo oscuro para dar ambiente tétrico */
+    color: #f0f0f0; /* Color claro para el texto */
+    font-family: 'Cinzel', serif; /* Fuente con estilo místico */
+    margin: 0;
+  }
+  
+  .listado-espiritus {
+    max-width: 800px;
+    background-color: #2a2a2a; /* Fondo más claro que el fondo del body */
+    border: 2px solid #444; /* Borde tenue para contenedor */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+    
+  }
+  
+  .listado-espiritus h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: #d4af37; /* Color dorado para destacar el título */
+    margin-bottom: 1.5rem;
+  }
+  
+  .espiritus-list {
+    list-style-type: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    margin-right: 40px;
+  }
+  
+  .espiritu-item {
+    background-color: #1f1f1f; /* Fondo oscuro para cada ítem */
+    margin: 5px;
+    border: 1px solid #333; /* Borde sutil para separar los ítems */
+    border-radius: 5px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .espiritu-item:hover {
+    transform: scale(1.05); /* Pequeño aumento al pasar el mouse */
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
+  }
+  
+  .espiritu-nombre {
+    font-size: 1.5rem;
+    color: #e85d04; /* Resalta los nombres en un color vibrante */
+    margin-bottom: 0.5rem;
+  }
+  
+  .espiritu-tipo, .espiritu-energia, .espiritu-ubicacion {
+    font-size: 1rem;
+    margin: 0.3rem 0;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #d4af37;
+    margin-top: 2rem;
+  }
+  
+  .error {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #ff4d4f; /* Rojo vibrante para mensajes de error */
+    margin-top: 2rem;
+  }
+
+  progress {
+    width: 100%;
+    height: 20px;
+    border: none;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #e0e0e0; /* Fondo de la barra */
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #e0e0e0; /* Fondo del contenedor */
+    border-radius: 5px;
+  }
+  
+  progress::-webkit-progress-value {
+    border-radius: 5px;
+  }
+
+  progress.low::-webkit-progress-value {
+    background-color: #4caf50; /* Verde para niveles bajos */
+  }
+  
+  progress.medium::-webkit-progress-value {
+    background-color: #ffeb3b; /* Amarillo para niveles medios */
+  }
+  
+  progress.high::-webkit-progress-value {
+    background-color: #f44336; /* Rojo para niveles altos */
+  }
+
+  progress.low::-moz-progress-bar {
+    background-color: #4caf50; /* Verde */
+  }
+  
+  progress.medium::-moz-progress-bar {
+    background-color: #ffeb3b; /* Amarillo */
+  }
+  
+  progress.high::-moz-progress-bar {
+    background-color: #f44336; /* Rojo */
+  }
