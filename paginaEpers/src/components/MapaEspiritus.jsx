@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup ,Polygon} from "react-leaflet";
 import "leaflet/dist/leaflet.css"; // Importa los estilos de Leaflet
 import L from "leaflet";
 import "./MapaEspiritus.css";
@@ -8,6 +8,8 @@ import {useNavigate } from "react-router-dom";
 import customIcon from "../assets/ubicacion.svg";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import EspirituDescripcion from "./EspirituDescripcion";
+import UbicacionDetalles from "./UbicacionDetalles";
 
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
@@ -26,6 +28,7 @@ const MapWorld = () => {
   const [nombreEspiritu, setNombreEspiritu] = useState("");
   const [idUbicacion, setIdUbicacion] = useState(0);
   const [reload, setReload] = useState(false);
+  
 
   useEffect(() => {
     const fetchEspiritus = async () => {
@@ -42,6 +45,7 @@ const MapWorld = () => {
       try {
         const response = await axios.get("http://localhost:8080/ubicaciones");
         setUbicaciones(response.data);
+        console.log(response.data)
       } catch (err) {
         console.error(err);
       }finally{
@@ -49,8 +53,8 @@ const MapWorld = () => {
       }
     }
 
-    fetchEspiritus();
     fetchUbicaciones();
+    fetchEspiritus();
   }, [reload]);
 
   const handleCreateMedium = () => {
@@ -62,7 +66,7 @@ const MapWorld = () => {
         energia: 100,
         mana: 10,
         manaMax: 20,
-        coordenada:{longitud: -58.3860, latitud: -34.6080}
+        coordenada:{longitud: -58.27789, latitud: -34.706285}
       }
       console.log(body)
       axios.post("http://localhost:8080/medium", body)
@@ -75,14 +79,17 @@ const MapWorld = () => {
     }
   }
 
+
   const handleCreateEspiritu = () => {
+    
     try{
+      console.log(idUbicacion)
       const body = {
         nombre: nombreEspiritu,
         ubicacionId: idUbicacion,
         energia: 100,
         tipo: "ANGELICAL",
-        coordenada:{longitud:-34.6080 , latitud:-58.3870 }
+        coordenada:{longitud: -58.27795, latitud: -34.706290}
       }
       console.log(body)
       axios.post("http://localhost:8080/espiritus", body)
@@ -95,7 +102,20 @@ const MapWorld = () => {
     }
   }
 
-  
+  const getColorByClima = (tipoClima) => {
+    switch (tipoClima) {
+      case "CALUROSO":
+        return "red"; // Color para clima caluroso
+      case "FRIO":
+        return "blue"; // Color para clima frío
+      case "TEMPLADO":
+        return "green"; // Color para clima templado
+      case "TORMENTA":
+        return "gray"; // Color para tormenta
+
+    }
+  }
+
   const handleGoMediumList = () => {
     navigate('/mediums')
   }
@@ -107,7 +127,7 @@ const MapWorld = () => {
       {/* Contenedor para el mapa */}
       <MapContainer
         id="map"
-        center={[-34.6037, -58.3816]} // Coordenadas de Buenos Aires
+        center={[-34.706285, -58.27789]} // Coordenadas de Buenos Aires
         zoom={13} // Nivel de zoom
         style={{ height: "400px", width: "100%" }} // Ajusta el tamaño del mapa
       >
@@ -117,12 +137,26 @@ const MapWorld = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {espiritus.map((espiritu) => (
-          <Marker key={espiritu.id} position={[espiritu.coordenada.longitud, espiritu.coordenada.latitud]}  icon={customSvgIcon}>
+          <Marker key={espiritu.id} position={[espiritu.coordenada.latitud,espiritu.coordenada.longitud]}  icon={customSvgIcon}>
             <Popup>
-              {espiritu.nombre} <br /> ¡Aquí está el espíritu!
+              <EspirituDescripcion espiritu={espiritu}/>            
             </Popup>
           </Marker>
         ))}
+
+        {ubicaciones.map((ubicacion) => (
+          <Polygon
+            key={ubicacion.id}
+            positions={ubicacion.area.map(coordenada => [coordenada.latitud, coordenada.longitud])}
+            color={getColorByClima(ubicacion.tipoClima)} // Color según el clima
+          >
+            <Popup>
+              <UbicacionDetalles ubicacion={ubicacion}/>
+              
+            </Popup>
+          </Polygon>
+        ))}
+
       </MapContainer>
     <div className="butonsContainer">
       <div className="butonList">
@@ -131,6 +165,10 @@ const MapWorld = () => {
       <div className="buton">
         <button className="butons" onClick={handleGoEspiritusList}>Ver lista de Espiritus</button>
       </div>
+      <div className="butonEstadistica">
+        <button onClick={() => navigate('/estadisticas')}>Ver Estadísticas</button>
+      </div>
+      
     </div>
       <div className="section">
         {/* Sección de mediums */}

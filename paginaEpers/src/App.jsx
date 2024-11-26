@@ -3,6 +3,7 @@ import './App.css'
 import Map from './components/MapaEspiritus'
 import Mediums from './components/Medium'
 import Espiritus from './components/Espiritu'
+import Estadisticas from "./components/Estadisticas";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Map />} />
         <Route path="/mediums" element={<Mediums />} />
         <Route path="/espiritus" element={<Espiritus />} />
+        <Route path="/estadisticas" element={<Estadisticas />} />
       </Routes>
     </Router>
     
