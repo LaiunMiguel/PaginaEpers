@@ -21,23 +21,81 @@ const MapWorld = () => {
   });
   const navigate = useNavigate();
   const [espiritus, setEspiritus] = useState([]);
-  const [mediums, setMediums] = useState();
+  const [ubicaciones, setUbicaciones] = useState([]);
+  const [nombreMedium, setNombreMedium] = useState("");
+  const [nombreEspiritu, setNombreEspiritu] = useState("");
+  const [idUbicacion, setIdUbicacion] = useState(0);
+  const [reload, setReload] = useState(false);
+
   useEffect(() => {
     const fetchEspiritus = async () => {
       try {
         const response = await axios.get("http://localhost:8080/espiritus");
         setEspiritus(response.data);
+        console.log(response.data)
       } catch (err) {
         console.error(err);
       }
     }
+    
+    const fetchUbicaciones = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/ubicaciones");
+        setUbicaciones(response.data);
+      } catch (err) {
+        console.error(err);
+      }finally{
+        setReload(false);
+      }
+    }
+
     fetchEspiritus();
-  }, [mediums]);
+    fetchUbicaciones();
+  }, [reload]);
 
+  const handleCreateMedium = () => {
+    console.log(idUbicacion)
+    try{
+      const body = {
+        nombre: nombreMedium,
+        ubicacionId: idUbicacion,
+        energia: 100,
+        mana: 10,
+        manaMax: 20,
+        coordenada:{longitud: -58.3860, latitud: -34.6080}
+      }
+      console.log(body)
+      axios.post("http://localhost:8080/medium", body)
+      setNombreMedium("");
 
+    }catch(err){
+      console.error(err)
+    }finally{
+      setReload(!reload)
+    }
+  }
 
+  const handleCreateEspiritu = () => {
+    try{
+      const body = {
+        nombre: nombreEspiritu,
+        ubicacionId: idUbicacion,
+        energia: 100,
+        tipo: "ANGELICAL",
+        coordenada:{longitud:-34.6080 , latitud:-58.3870 }
+      }
+      console.log(body)
+      axios.post("http://localhost:8080/espiritus", body)
+      setNombreEspiritu("");
 
-console.log(espiritus);
+    }catch(err){
+      console.error(err)
+    }finally{
+      setReload(!reload)
+    }
+  }
+
+  
   const handleGoMediumList = () => {
     navigate('/mediums')
   }
@@ -84,15 +142,24 @@ console.log(espiritus);
               type="text"
               id="mediumName"
               placeholder="Ingresa el nombre del médium"
+              value={nombreMedium}
+              onChange={(e) => setNombreMedium(e.target.value)}
             />
           </div>
           <div className="form-group">
             <label htmlFor="mediumLocation">Ubicación</label>
-            <select id="mediumLocation">
+            <select id="mediumLocation" onChange={(e) => setIdUbicacion(e.target.value)}>
               <option>Selecciona ubicación</option>
+              {ubicaciones.length > 0 ? (
+                ubicaciones.map((ubicacion) => (
+                  <option key={ubicacion.id} value={ubicacion.id}>
+                    {ubicacion.nombre}
+                  </option>
+                ))
+              ): "No hay ubicaciones"}
             </select>
           </div>
-          <button>Crear</button>
+          <button onClick={handleCreateMedium}>Crear</button>
         </div>
 
         
@@ -104,15 +171,24 @@ console.log(espiritus);
               type="text"
               id="spiritName"
               placeholder="Ingresa el nombre del espíritu"
+              value={nombreEspiritu}
+              onChange={(e) => setNombreEspiritu(e.target.value)}
             />
           </div>
           <div className="form-group">
             <label htmlFor="spiritLocation">Ubicación</label>
-            <select id="spiritLocation">
+            <select id="spiritLocation" onChange={(e) => setIdUbicacion(e.target.value)}>
               <option>Selecciona ubicación</option>
+              {ubicaciones.length > 0 ? (
+                ubicaciones.map((ubicacion) => (
+                  <option key={ubicacion.id} value={ubicacion.id}>
+                    {ubicacion.nombre}
+                  </option>
+                ))
+              ): "No hay ubicaciones"}
             </select>
           </div>
-          <button>Crear</button>
+          <button onClick={handleCreateEspiritu}>Crear</button>
         </div>
       </div>
     </div>
