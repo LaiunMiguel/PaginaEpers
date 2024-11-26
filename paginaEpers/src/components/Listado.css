@@ -6,6 +6,9 @@ body {
   }
   
   .listado-espiritus {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     max-width: 800px;
     background-color: #2a2a2a; /* Fondo más claro que el fondo del body */
     border: 2px solid #444; /* Borde tenue para contenedor */
@@ -22,22 +25,35 @@ body {
   }
   
   .espiritus-list {
-    list-style-type: none;
     display: grid;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
     grid-template-columns: repeat(3, 1fr); 
-    margin-right: 40px;
   }
   
   .espiritu-item {
-    background-color: #1f1f1f; /* Fondo oscuro para cada ítem */
+    background-color: #1f1f1f; 
     margin: 5px;
-    border: 1px solid #333; /* Borde sutil para separar los ítems */
+    border: 1px solid #333; 
     border-radius: 5px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    text-align: center;
     transition: transform 0.3s, box-shadow 0.3s;
   }
   
   .espiritu-item:hover {
-    transform: scale(1.05); /* Pequeño aumento al pasar el mouse */
+    transform: scale(1.05); 
     box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
   }
   
