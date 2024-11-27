@@ -16,7 +16,7 @@ const EspirituDescripcion = ({espiritu}) => {
               console.log(response.data)
               setPicos(response.data)
             } catch (error) {
-              console.error("Error al obtener los picos máximos y mínimos:", error);
+             setPicos([0,0])
             }
           };
           obtenerMaximosMinimosCorrupcion(espiritu.id);

@@ -6,7 +6,7 @@ import axios from "axios";
 
 const UbicacionDetalles = ({ubicacion}) => {
 
-    const [climaStats, setClima] = useState([]);
+    const [climaStats, setClima] = useState("");
 
     useEffect(() => {
         const obtenerPromedio7Dias = async (ubicacionId) => {

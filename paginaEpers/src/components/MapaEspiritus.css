@@ -32,7 +32,7 @@ body {
     gap: 30px; 
     
 }
-.mediums, .spirits {
+.mediums, .spirits, .sectionMover {
     border: 1px solid #333;
     background-color: #222;
     padding: 20px;
@@ -42,7 +42,7 @@ body {
     border-radius: 8px;
     transition: transform 0.3s;
 }
-.mediums:hover, .spirits:hover {
+.mediums:hover, .spirits:hover , .sectionMover:hover {
     transform: scale(1.05);
 }
 h3 {

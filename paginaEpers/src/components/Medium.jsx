@@ -35,22 +35,6 @@ const ListadoMediums = () => {
    // setMediums(response.data)
   }
 
-  const handleMover= async (id)=>{
-    try {
-      const nuevasCoordenadas = {latitud:-58.26093034931972 ,longitud:-34.7239854284505 };
-      const response = await axios.put(`http://localhost:8080/medium/${id}/mover`, nuevasCoordenadas);
-      
-      console.log('Medium movido con éxito:', response.data);
-      
-      // setMediums(response.data);
-    } catch (error) {
-      console.error('Error al mover el médium:', error);
-    }
-
-    finally{
-      setReload(!reload)
-    }
-  }
 
 
 console.log(mediums)
@@ -67,11 +51,10 @@ console.log(mediums)
             <p className="espiritu-tipo">Espiritus: {mediums.espiritus.map(e => e.nombre).join(', ') }</p>
             <p className="espiritu-energia">Energía: {mediums.mana}</p>
             <p className="espiritu-ubicacion">
-              Ubicación: {mediums.coordenada.latitud}, {mediums.coordenada.longitud}
+              Ubicación: {mediums.ubicacion.nombre}<br/>{mediums.coordenada.latitud}, {mediums.coordenada.longitud}
             </p>
             
             <button onClick={()=>handleDescansar(mediums.id)}>Descansar</button>
-            <button onClick={()=>handleMover(mediums.id)}>Mover</button>
           </li>
         ))}
       </ul>

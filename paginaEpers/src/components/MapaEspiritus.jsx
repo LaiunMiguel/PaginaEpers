@@ -10,6 +10,7 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import EspirituDescripcion from "./EspirituDescripcion";
 import UbicacionDetalles from "./UbicacionDetalles";
+import PolygonMap from "./PolygonMap";
 
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
@@ -24,18 +25,22 @@ const MapWorld = () => {
   const navigate = useNavigate();
   const [espiritus, setEspiritus] = useState([]);
   const [ubicaciones, setUbicaciones] = useState([]);
-  const [nombreMedium, setNombreMedium] = useState("");
   const [nombreEspiritu, setNombreEspiritu] = useState("");
   const [idUbicacion, setIdUbicacion] = useState(0);
+  const [idMedium, setIdMedium] = useState(0);
+  const [idEspiritu, setIdEspiritu] = useState(0);
   const [reload, setReload] = useState(false);
-  
+  const [mediums, setMediums] = useState([]);
+  const [coordenadas, setCoordenadas] = useState([]);
+  const [latitud, setLatitud] = useState({});
+  const [longitud, setLongitud] = useState({});
+  const [tipoEspiritu, setTipoEspiritu] = useState("");
 
   useEffect(() => {
     const fetchEspiritus = async () => {
       try {
         const response = await axios.get("http://localhost:8080/espiritus");
         setEspiritus(response.data);
-        console.log(response.data)
       } catch (err) {
         console.error(err);
       }
@@ -45,32 +50,31 @@ const MapWorld = () => {
       try {
         const response = await axios.get("http://localhost:8080/ubicaciones");
         setUbicaciones(response.data);
-        console.log(response.data)
       } catch (err) {
         console.error(err);
       }finally{
         setReload(false);
       }
     }
+    const fetchMediums = async () => {
+      try{
+        const response = await axios.get("http://localhost:8080/medium");
+        setMediums(response.data);
+      }
+      catch(err){
+        console.error(err)
+      }
+    }
 
     fetchUbicaciones();
     fetchEspiritus();
+    fetchMediums();
   }, [reload]);
 
-  const handleCreateMedium = () => {
-    console.log(idUbicacion)
+  const handleConectarEspiritu = async () => {
     try{
-      const body = {
-        nombre: nombreMedium,
-        ubicacionId: idUbicacion,
-        energia: 100,
-        mana: 10,
-        manaMax: 20,
-        coordenada:{longitud: -58.27789, latitud: -34.706285}
-      }
-      console.log(body)
-      axios.post("http://localhost:8080/medium", body)
-      setNombreMedium("");
+      const response = await axios.put(`http://localhost:8080/espiritus/${idEspiritu}/conectar/${idMedium}`)
+      console.log(response)
 
     }catch(err){
       console.error(err)
@@ -88,10 +92,9 @@ const MapWorld = () => {
         nombre: nombreEspiritu,
         ubicacionId: idUbicacion,
         energia: 100,
-        tipo: "ANGELICAL",
-        coordenada:{longitud: -58.27795, latitud: -34.706290}
+        tipo: tipoEspiritu,
+        coordenada:coordenadas[0]
       }
-      console.log(body)
       axios.post("http://localhost:8080/espiritus", body)
       setNombreEspiritu("");
 
@@ -103,16 +106,36 @@ const MapWorld = () => {
   }
 
   const getColorByClima = (tipoClima) => {
-    switch (tipoClima) {
-      case "CALUROSO":
-        return "red"; // Color para clima caluroso
-      case "FRIO":
-        return "blue"; // Color para clima frío
-      case "TEMPLADO":
-        return "green"; // Color para clima templado
-      case "TORMENTA":
-        return "gray"; // Color para tormenta
+    const optionsMap ={
+    "TORMENTA": "red",
+    "TEMPLADO" : "green",
+    "CALUROSO" : "yellow",
+    "FRIO": "blue"
+    }
+    return optionsMap[tipoClima];
+  }
 
+  const handleCoordenadas = (idUbicacion) => {
+    setIdUbicacion(idUbicacion);
+    const optionsMap= {
+      "2664" : [{longitud: -58.28062036755716, latitud: -34.70764336914739}], //unqui
+      "2665" : [{longitud: -58.25967081722169, latitud:-34.722888081266305 }] //estacion cambiar coords
+    }
+    setCoordenadas(optionsMap[idUbicacion]);
+  }
+
+  const handleMover= async ()=>{
+    try {
+      const response = await axios.put(`http://localhost:8080/medium/${idMedium}/mover`, {longitud: latitud, latitud: longitud});
+      
+      console.log('Medium movido con éxito:', response.data);
+      
+      // setMediums(response.data);
+    } catch (error) {
+      console.error('Error al mover el médium:', error);
+    }
+    finally{
+      setReload(!reload)
     }
   }
 
@@ -122,7 +145,8 @@ const MapWorld = () => {
   const handleGoEspiritusList = () => {
     navigate('/espiritus')
   }
-  return (
+  
+  return (<>
     <div className="container">
       {/* Contenedor para el mapa */}
       <MapContainer
@@ -143,20 +167,8 @@ const MapWorld = () => {
             </Popup>
           </Marker>
         ))}
-
-        {ubicaciones.map((ubicacion) => (
-          <Polygon
-            key={ubicacion.id}
-            positions={ubicacion.area.map(coordenada => [coordenada.latitud, coordenada.longitud])}
-            color={getColorByClima(ubicacion.tipoClima)} // Color según el clima
-          >
-            <Popup>
-              <UbicacionDetalles ubicacion={ubicacion}/>
-              
-            </Popup>
-          </Polygon>
-        ))}
-
+        <PolygonMap ubicaciones={ubicaciones}/>
+        
       </MapContainer>
     <div className="butonsContainer">
       <div className="butonList">
@@ -173,31 +185,34 @@ const MapWorld = () => {
       <div className="section">
         {/* Sección de mediums */}
         <div className="mediums">
-          <h3>MEDIUMS</h3>
+          <h3>Conectar Espritu a Medium</h3>
           <div className="form-group">
-            <label htmlFor="mediumName">Nombre</label>
-            <input
-              type="text"
-              id="mediumName"
-              placeholder="Ingresa el nombre del médium"
-              value={nombreMedium}
-              onChange={(e) => setNombreMedium(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="mediumLocation">Ubicación</label>
-            <select id="mediumLocation" onChange={(e) => setIdUbicacion(e.target.value)}>
-              <option>Selecciona ubicación</option>
-              {ubicaciones.length > 0 ? (
-                ubicaciones.map((ubicacion) => (
-                  <option key={ubicacion.id} value={ubicacion.id}>
-                    {ubicacion.nombre}
+            <label htmlFor="mediumName">Mediums</label>
+            <select id="medium" onChange={(e) => setIdMedium(e.target.value)}>
+              <option>Selecciona un medium</option>
+              {mediums.length > 0 ? (
+                mediums.map((medium) => (
+                  <option key={medium.id} value={medium.id}>
+                    {medium.nombre}
                   </option>
                 ))
-              ): "No hay ubicaciones"}
+              ): "No hay mediums"}
             </select>
           </div>
-          <button onClick={handleCreateMedium}>Crear</button>
+          <div className="form-group">
+            <label htmlFor="esp">Espiritus</label>
+            <select id="esp" onChange={(e) => setIdEspiritu(e.target.value)}>
+              <option>Selecciona un espiritu</option>
+              {espiritus.length > 0 ? (
+                espiritus.map((espiritu) => (
+                  <option key={espiritu.id} value={espiritu.id}>
+                    {espiritu.nombre}
+                  </option>
+                ))
+              ): "No hay espiritus"}
+            </select>
+          </div>
+          <button onClick={handleConectarEspiritu}>Conectar</button>
         </div>
 
         
@@ -214,8 +229,18 @@ const MapWorld = () => {
             />
           </div>
           <div className="form-group">
+            <label htmlFor="spiritName">TipoDeEspiritu</label>
+            <input
+              type="text"
+              id="spiritName"
+              placeholder="Ingresa el tipo del espíritu"
+              value={tipoEspiritu}
+              onChange={(e) => setTipoEspiritu(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
             <label htmlFor="spiritLocation">Ubicación</label>
-            <select id="spiritLocation" onChange={(e) => setIdUbicacion(e.target.value)}>
+            <select id="spiritLocation" onChange={(e) => handleCoordenadas(e.target.value)}>
               <option>Selecciona ubicación</option>
               {ubicaciones.length > 0 ? (
                 ubicaciones.map((ubicacion) => (
@@ -226,10 +251,96 @@ const MapWorld = () => {
               ): "No hay ubicaciones"}
             </select>
           </div>
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Coordenada Longitud</label>
+            <select id="mediumLocation" onChange={(e) => setLongitud(e.target.value)}>
+              <option>Selecciona una coordenada</option>
+              {coordenadas.length > 0 ? (
+                coordenadas.map((coordenada, index) => (
+                  <option key={index} value={coordenada.longitud}>
+                    {coordenada.longitud}
+                  </option>
+                ))
+              ): "No hay coordenada"}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Coordenada Latitud</label>
+            <select id="mediumLocation" onChange={(e) => setLatitud(e.target.value)}>
+              <option>Selecciona una coordenada</option>
+              {coordenadas.length > 0 ? (
+                coordenadas.map((coordenada, index) => (
+                  <option key={index} value={coordenada.latitud}>
+                    {coordenada.latitud}
+                  </option>
+                ))
+              ): "No hay coordenada"}
+            </select>
+          </div>
           <button onClick={handleCreateEspiritu}>Crear</button>
+        </div>
+        
+        <div className="sectionMover">
+          <h3>Mover Medium</h3>
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Medium</label>
+            <select onChange={(e) => setIdMedium(e.target.value)}>
+              <option> seleccione al Medium</option>
+              {mediums.length > 0 ?(
+                mediums.map((medium) => (                  
+                  <option key={medium.id} value={medium.id}>
+                    {medium.nombre}
+                  </option>
+                )
+              )): "No hay mediums"}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Ubicación</label>
+            <select id="mediumLocation" onChange={(e) => handleCoordenadas(e.target.value)}>
+              <option>Selecciona ubicación</option>
+              {ubicaciones.length > 0 ? (
+                ubicaciones.map((ubicacion) => (
+                  <option key={ubicacion.id} value={ubicacion.id}>
+                    {ubicacion.nombre}
+                  </option>
+                ))
+              ): "No hay ubicaciones"}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Coordenada Longitud</label>
+            <select id="mediumLocation" onChange={(e) => setLongitud(e.target.value)}>
+              <option>Selecciona una coordenada</option>
+              {coordenadas.length > 0 ? (
+                coordenadas.map((coordenada, index) => (
+                  <option key={index} value={coordenada.longitud}>
+                    {coordenada.longitud}
+                  </option>
+                ))
+              ): "No hay coordenada"}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="spiritLocation">Coordenada Latitud</label>
+            <select id="mediumLocation" onChange={(e) => setLatitud(e.target.value)}>
+              <option>Selecciona una coordenada</option>
+              {coordenadas.length > 0 ? (
+                coordenadas.map((coordenada, index) => (
+                  <option key={index} value={coordenada.latitud}>
+                    {coordenada.latitud}
+                  </option>
+                ))
+              ): "No hay coordenada"}
+            </select>
+          </div>
+          <button onClick={handleMover}>Mover</button>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

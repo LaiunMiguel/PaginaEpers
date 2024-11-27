@@ -41,7 +41,7 @@ const ListadoEspiritus = () => {
             <p className="espiritu-tipo">Tipo: {espiritu.tipo}</p>
             <p className="espiritu-energia">Energía: {espiritu.energia}</p>
             <p className="espiritu-ubicacion">
-              Ubicación: {espiritu.coordenada.latitud}, {espiritu.coordenada.longitud}
+              Ubicación:{espiritu.ubicacion.nombre}<br/>{espiritu.coordenada.latitud}, {espiritu.coordenada.longitud}
             </p>
             <p className="nivel-corrupcion">Nivel De Corrupcion </p>
             <progress className={getProgressColorClass(espiritu.nivelDeCorrupcion)}value={espiritu.nivelDeCorrupcion} max="100"></progress>
