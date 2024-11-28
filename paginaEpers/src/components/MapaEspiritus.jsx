@@ -118,8 +118,8 @@ const MapWorld = () => {
   const handleCoordenadas = (idUbicacion) => {
     setIdUbicacion(idUbicacion);
     const optionsMap= {
-      "2664" : [{longitud: -58.28062036755716, latitud: -34.70764336914739}], //unqui
-      "2665" : [{longitud: -58.25967081722169, latitud:-34.722888081266305 }] //estacion cambiar coords
+      "3" : [{longitud: -58.28062036755716, latitud: -34.70764336914739}], //unqui
+      "4" : [{longitud: -58.25967081722169, latitud:-34.722888081266305 }] //estacion cambiar coords
     }
     setCoordenadas(optionsMap[idUbicacion]);
   }
